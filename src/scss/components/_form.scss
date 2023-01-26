@@ -1,0 +1,29 @@
+.search-form {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: auto;
+    margin-left: auto;
+
+    width: 200px;
+}
+.search-form__input {
+    border-radius: 4%;
+    padding: 10px;
+}
+.search-form__button {
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+
+    background-color: inherit;
+    border: none;
+}
+.search-form__icon {
+    width: 50%;
+    height: 50%;
+}
