@@ -1,3 +1,6 @@
+import ApiService from '../services/api.service';
+import IntersectionObserverServices from '../services/infinite-scroll.service';
+import refs from './vars';
 const cardTemplates = require('../templates/card.hbs');
 
 interface Card {
@@ -24,7 +27,16 @@ interface Card {
     user: string;
     userImageURL: string;
 }
-
+interface Request {
+    query: string;
+    page: number;
+    service: ApiService;
+}
+interface UpdatedRefsRequest {
+    lastCard: Element;
+    images: Element[];
+    service: ApiService;
+}
 export const mackGalleryMarkup = (cards: Card[]) =>
     cards
         .map((c: Card) =>
@@ -44,4 +56,28 @@ export const inputFind = (e: FormDataEvent) =>
     );
 export const formReset = (i: HTMLInputElement) => {
     i.value = '';
+};
+export const setRequestInformation = ({ page, query, service }: Request) => {
+    service.setPage(page);
+    service.setQuery(query);
+};
+export const updateMarkup = (hits: Card[]) => {
+    const markup = mackGalleryMarkup(hits);
+    refs.list.insertAdjacentHTML('beforeend', markup);
+};
+export const updateRefsAndResetObservers = ({
+    lastCard,
+    images,
+    service,
+}: UpdatedRefsRequest) => {
+    const intersectionObserverServices = new IntersectionObserverServices();
+
+    refs.images = images;
+    refs.lastCard = lastCard;
+    refs.images.forEach((img) => {
+        intersectionObserverServices.lazyLoad().observe(img);
+    });
+    intersectionObserverServices
+        .infinityScroll(service.getQuery(), service.getPage() + 1)
+        .observe(refs.lastCard);
 };

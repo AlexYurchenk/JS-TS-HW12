@@ -1,8 +1,8 @@
 interface refs {
     list: HTMLUListElement;
     form: HTMLFormElement;
-    lastCard: null | HTMLElement;
-    images: HTMLImageElement[];
+    lastCard: null | Element;
+    images: Element[];
 }
 const refs: refs = {
     list: document.querySelector('.gallery'),

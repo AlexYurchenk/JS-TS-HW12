@@ -1,6 +1,9 @@
-import { mackGalleryMarkup } from '../helpers/helpers';
+import {
+    updateMarkup,
+    setRequestInformation,
+    updateRefsAndResetObservers,
+} from '../helpers/helpers';
 import ApiService from './api.service';
-import refs from '../helpers/vars';
 const callbackLazyLoad = (
     entries: IntersectionObserverEntry[],
     observer: IntersectionObserver
@@ -36,26 +39,20 @@ class IntersectionObserverServices {
                 const [entry] = entries;
                 if (entry.isIntersecting) {
                     observer.unobserve(entry.target);
-                    apiService.setPage(p);
-                    apiService.setQuery(q);
+                    setRequestInformation({
+                        page: p,
+                        query: q,
+                        service: apiService,
+                    });
                     apiService.getImages().then(({ hits }) => {
-                        const markup = mackGalleryMarkup(hits);
-                        refs.list.insertAdjacentHTML('beforeend', markup);
-                        refs.lastCard = document.querySelector(
-                            '.gallery__item:last-child'
-                        );
-                        const images = document.querySelectorAll('.js-img');
-                        images.forEach((img) => {
-                            intersectionObserverServices
-                                .lazyLoad()
-                                .observe(img);
+                        updateMarkup(hits);
+                        updateRefsAndResetObservers({
+                            lastCard: document.querySelector(
+                                '.gallery__item:last-child'
+                            ),
+                            service: apiService,
+                            images: [...document.querySelectorAll('.js-img')],
                         });
-                        intersectionObserverServices
-                            .infinityScroll(
-                                apiService.getQuery(),
-                                apiService.getPage() + 1
-                            )
-                            .observe(refs.lastCard);
                     });
                 }
             },

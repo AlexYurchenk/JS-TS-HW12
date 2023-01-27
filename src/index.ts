@@ -7,7 +7,13 @@ import { alert, error } from '@pnotify/core';
 import refs from './helpers/vars';
 import ApiService from './services/api.service';
 import IntersectionObserverServices from './services/infinite-scroll.service';
-import { mackGalleryMarkup, inputFind, formReset } from './helpers/helpers';
+import {
+    inputFind,
+    formReset,
+    updateMarkup,
+    updateRefsAndResetObservers,
+    setRequestInformation,
+} from './helpers/helpers';
 const apiService = new ApiService();
 const intersectionObserverServices = new IntersectionObserverServices();
 
@@ -21,20 +27,15 @@ refs.form.addEventListener('submit', (e: FormDataEvent) => {
         formReset(input);
         return alert('Bad request');
     }
-    apiService.setQuery(request);
-    apiService.setPage(1);
+    setRequestInformation({ page: 1, query: request, service: apiService });
     apiService.getImages().then(({ hits }) => {
         try {
-            const markup = mackGalleryMarkup(hits);
-            refs.list.insertAdjacentHTML('beforeend', markup);
-            const images = document.querySelectorAll('.js-img');
-            images.forEach((img) => {
-                intersectionObserverServices.lazyLoad().observe(img);
+            updateMarkup(hits);
+            updateRefsAndResetObservers({
+                service: apiService,
+                images: [...document.querySelectorAll('.js-img')],
+                lastCard: document.querySelector('.gallery__item:last-child'),
             });
-            refs.lastCard = document.querySelector('.gallery__item:last-child');
-            intersectionObserverServices
-                .infinityScroll(apiService.getQuery(), apiService.getPage() + 1)
-                .observe(refs.lastCard);
         } catch (e) {
             console.log(e);
             error('Something went wrong');
