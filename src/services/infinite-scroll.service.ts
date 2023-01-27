@@ -60,6 +60,5 @@ class IntersectionObserverServices {
         );
     }
 }
-const intersectionObserverServices = new IntersectionObserverServices();
 
 export default IntersectionObserverServices;
